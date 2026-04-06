@@ -73,18 +73,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-'''
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "djangoscad_db",
-        "USER": "barbara",
-        "PASSWORD": "p6Rs1f6l", #postgres=# ALTER USER barbara WITH PASSWORD 'p6Rs1f6l';
-        "HOST": "localhost",
-        "PORT": "5432",
-    }
-}
-'''
+
 DATABASES = {
     "default": {
         "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.postgresql"),
