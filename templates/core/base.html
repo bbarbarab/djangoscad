@@ -158,6 +158,32 @@
         <a href="/scadenze/">Scadenze</a>
         <a href="/admin/">Admin</a>
     </nav>
+    {% if request.user.is_authenticated %}
+        <div style="margin-top: 8px; font-size: 14px;">
+            Ciao
+            {% if request.user.first_name %}
+                {{ request.user.first_name }}
+            {% else %}
+                {{ request.user.username }}
+            {% endif %}
+            👋
+            |
+            <form method="post" action="{% url 'logout' %}" style="display: inline; margin-left: 8px;">
+                {% csrf_token %}
+                <button type="submit" style="
+                    background: none;
+                    border: none;
+                    color: white;
+                    cursor: pointer;
+                    padding: 0;
+                    font: inherit;
+                    text-decoration: underline;
+                ">
+                    Esci
+                </button>
+            </form>
+        </div>
+    {% endif %}
 </header>
 
 <div class="container">
