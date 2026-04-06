@@ -1,0 +1,144 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<h2>Dashboard</h2>
+<p class="small">Panoramica rapida delle scadenze.</p>
+
+<form method="get" class="filters">
+    <select name="soggetto">
+        <option value="">Tutti i soggetti</option>
+        {% for s in soggetti %}
+            <option value="{{ s.id }}" {% if soggetto_selezionato == s.id|stringformat:"s" %}selected{% endif %}>
+                {{ s.nome }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="stato">
+        <option value="">Tutti gli stati</option>
+        <option value="da_fare" {% if stato_selezionato == "da_fare" %}selected{% endif %}>Da fare</option>
+        <option value="in_corso" {% if stato_selezionato == "in_corso" %}selected{% endif %}>In corso</option>
+        <option value="fatto" {% if stato_selezionato == "fatto" %}selected{% endif %}>Fatto</option>
+        <option value="in_attesa" {% if stato_selezionato == "in_attesa" %}selected{% endif %}>In attesa</option>
+        <option value="da_chiarire" {% if stato_selezionato == "da_chiarire" %}selected{% endif %}>Da chiarire</option>
+    </select>
+
+    <button type="submit">Filtra</button>
+    <a href="/">Azzera filtri</a>
+</form>
+
+<div class="cards">
+    <div class="card">
+        <h3>Totale attività</h3>
+        <div class="big-number">{{ totale }}</div>
+    </div>
+
+    <div class="card">
+        <h3>Completate</h3>
+        <div class="big-number">{{ completate }}</div>
+    </div>
+
+    <div class="card">
+        <h3>In ritardo</h3>
+        <div class="big-number">{{ in_ritardo }}</div>
+    </div>
+
+    <div class="card">
+        <h3>In corso</h3>
+        <div class="big-number">{{ in_corso_count }}</div>
+    </div>
+</div>
+
+<h3 class="section-title">Da chiudere presto / urgenti</h3>
+<p class="small">Ordinamento basato sulla data di conclusione interna.</p>
+
+<table>
+    <tr>
+        <th>Ente</th>
+        <th>Progetto</th>
+        <th>Stato</th>
+        <th>Scadenza ufficiale</th>
+        <th>Giorni mancanti</th>
+    </tr>
+    {% for s in urgenti %}
+    <tr class="
+        {% if s.stato == 'fatto' %}
+            fatta
+        {% elif s.data_conclusione and s.data_conclusione < oggi %}
+            ritardo
+        {% elif s.data_conclusione and s.data_conclusione <= prossimi_7 %}
+            prossima
+        {% endif %}
+    ">
+    <tr>
+        <td>{{ s.ente|default:"—" }}</td>
+        <td>{{ s.edizione }}</td>
+        <td>
+            {% if s.stato == "fatto" %}
+                <span class="badge verde">Fatto</span>
+            {% elif s.stato == "in_corso" %}
+                <span class="badge giallo">In corso</span>
+            {% elif s.stato == "da_fare" %}
+                <span class="badge rosso">Da fare</span>
+            {% else %}
+                <span class="badge grigio">{{ s.get_stato_display }}</span>
+            {% endif %}
+        </td>
+        <td>{{ s.data_scadenza|date:"d/m/Y"|default:"—" }}</td>
+        <td>{{ s.giorni_alla_scadenza|default:"—" }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="7">Nessuna scadenza trovata.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h3 class="section-title">Attività in corso</h3>
+
+<table>
+    <tr>
+        <th>Titolo</th>
+        <th>Soggetto</th>
+        <th>Progetto</th>
+        <th>Conclusione</th>
+        <th>Scadenza ufficiale</th>
+    </tr>
+    {% for s in in_corso %}
+    <tr>
+        <td>{{ s.titolo }}</td>
+        <td>{{ s.edizione.progetto.soggetto|default:"—" }}</td>
+        <td>{{ s.edizione }}</td>
+        <td>{{ s.data_conclusione|date:"d/m/Y"|default:"—" }}</td>
+        <td>{{ s.data_scadenza|date:"d/m/Y"|default:"—" }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5">Nessuna attività in corso.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h3 class="section-title">Attività completate di recente</h3>
+
+<table>
+    <tr>
+        <th>Titolo</th>
+        <th>Soggetto</th>
+        <th>Progetto</th>
+        <th>Conclusione</th>
+    </tr>
+    {% for s in ultime_completate %}
+    <tr>
+        <td>{{ s.titolo }}</td>
+        <td>{{ s.edizione.progetto.soggetto|default:"—" }}</td>
+        <td>{{ s.edizione }}</td>
+        <td>{{ s.data_conclusione|date:"d/m/Y"|default:"—" }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4">Nessuna attività completata.</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

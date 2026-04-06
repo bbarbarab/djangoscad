@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <title>Scadenzario</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f7fa;
+            color: #222;
+        }
+
+        header {
+            background: #1f4e78;
+            color: white;
+            padding: 16px 24px;
+        }
+
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 16px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.08);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-size: 15px;
+            color: #555;
+        }
+
+        .big-number {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,.08);
+        }
+
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #eef3f8;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 16px;
+            border-radius: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.08);
+        }
+
+        .filters select,
+        .filters button,
+        .filters a {
+            padding: 8px 10px;
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .rosso { background: #e06666; color: white; }
+        .giallo { background: #f1c232; }
+        .verde { background: #6aa84f; color: white; }
+        .grigio { background: #999999; color: white; }
+
+        .section-title {
+            margin: 28px 0 12px 0;
+        }
+
+        .small {
+            color: #666;
+            font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            .cards {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 14px;
+            }
+        }
+
+        tr.ritardo td {
+            background: #f4cccc;
+        }
+
+        tr.prossima td {
+            background: #ffe599;
+        }
+
+        tr.fatta td {
+            background: #d9ead3;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Gestionale scadenziario</h1>
+    <nav>
+        <a href="/">Dashboard</a>
+        <a href="/scadenze/">Scadenze</a>
+        <a href="/admin/">Admin</a>
+    </nav>
+</header>
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>
