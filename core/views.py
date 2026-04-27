@@ -2,6 +2,7 @@ from datetime import timedelta
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView, ListView
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 
 from .models import Scadenza, Soggetto
 
@@ -89,6 +90,7 @@ class ScadenzaListView(LoginRequiredMixin, ListView):
         soggetto_id = self.request.GET.get("soggetto", "").strip()
         stato = self.request.GET.get("stato", "").strip()
         progetto_id = self.request.GET.get("progetto", "").strip()
+        responsabile_id = self.request.GET.get("responsabile", "").strip()
 
         if soggetto_id:
             qs = qs.filter(edizione__progetto__soggetto_id=soggetto_id)
@@ -98,17 +100,26 @@ class ScadenzaListView(LoginRequiredMixin, ListView):
 
         if progetto_id:
             qs = qs.filter(edizione__progetto_id=progetto_id)
+        if responsabile_id:
+            qs = qs.filter(responsabili__id=responsabile_id)
 
-        return qs.order_by("data_scadenza", "titolo")
+        return qs.order_by("data_conclusione", "data_scadenza", "titolo").distinct()
 
     def get_context_data(self, **kwargs):
+        
         ctx = super().get_context_data(**kwargs)
         from .models import Progetto
-
+        
+        User = get_user_model()
+        
         ctx["soggetti"] = Soggetto.objects.all().order_by("nome")
         ctx["progetti"] = Progetto.objects.select_related("soggetto").order_by("nome")
         ctx["soggetto_selezionato"] = self.request.GET.get("soggetto", "").strip()
         ctx["stato_selezionato"] = self.request.GET.get("stato", "").strip()
         ctx["progetto_selezionato"] = self.request.GET.get("progetto", "").strip()
+        
+        ctx["responsabili"] = User.objects.filter(is_active=True).order_by("first_name", "username")
+        ctx["responsabile_selezionato"] = self.request.GET.get("responsabile", "").strip()
+        
         return ctx
 
