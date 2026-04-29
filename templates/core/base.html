@@ -148,6 +148,122 @@
         tr.fatta td {
             background: #d9ead3;
         }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1f4e78;
+            color: white;
+            padding: 14px 18px;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.18);
+            font-weight: bold;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: white;
+            color: #1f4e78;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .user-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eef3f8;
+            border-radius: 999px;
+            padding: 4px 9px;
+            margin: 2px 4px 2px 0;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .mini-avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #1f4e78;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status.todo {
+            background: #fdecec;
+            color: #b42318;
+        }
+
+        .status.todo .status-dot {
+            background: #b42318;
+        }
+
+        .status.progress {
+            background: #fff4e5;
+            color: #b54708;
+        }
+
+        .status.progress .status-dot {
+            background: #b54708;
+        }
+
+        .status.done {
+            background: #ecfdf3;
+            color: #027a48;
+        }
+
+        .status.done .status-dot {
+            background: #027a48;
+        }
+
+        .status.waiting {
+            background: #eef2ff;
+            color: #3730a3;
+        }
+
+        .status.waiting .status-dot {
+            background: #3730a3;
+        }
+
+        .status.unclear {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .status.unclear .status-dot {
+            background: #4b5563;
+        }
+
     </style>
 </head>
 <body>
@@ -189,5 +305,34 @@
 <div class="container">
     {% block content %}{% endblock %}
 </div>
+
+{% if request.user.is_authenticated %}
+<div id="toast-msg" class="toast">
+    <span class="avatar">
+        {% if request.user.first_name %}
+            {{ request.user.first_name|first }}
+        {% else %}
+            {{ request.user.username|first }}
+        {% endif %}
+    </span>
+    <span>
+        Ciao
+        {% if request.user.first_name %}
+            {{ request.user.first_name }}
+        {% else %}
+            {{ request.user.username }}
+        {% endif %}
+        👋
+    </span>
+</div>
+
+<script>
+setTimeout(function() {
+    const t = document.getElementById("toast-msg");
+    if (t) t.style.display = "none";
+}, 3000);
+</script>
+{% endif %}
+
 </body>
 </html>
