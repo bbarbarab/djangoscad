@@ -84,9 +84,29 @@
             {% endif %}
         </td>
 
-        <td>{{ s.get_priorita_display }}</td>
+        <td>
+            {% if s.priorita == "alta" %}
+                <span class="priority alta">High</span>
+            {% elif s.priorita == "media" %}
+                <span class="priority media">Medium</span>
+            {% elif s.priorita == "bassa" %}
+                <span class="priority bassa">Low</span>
+            {% endif %}
+        </td>
         <td>{{ s.data_scadenza|date:"d/m/Y"|default:"—" }}</td>
-        <td>{{ s.giorni_alla_scadenza|default:"—" }}</td>
+        <td>
+            {% if s.giorni_alla_scadenza is not None %}
+                {% if s.giorni_alla_scadenza < 0 %}
+                    Scaduto
+                {% elif s.giorni_alla_scadenza == 0 %}
+                    Oggi
+                {% else %}
+                    {{ s.giorni_alla_scadenza }} gg
+                {% endif %}
+            {% else %}
+                —
+            {% endif %}
+        </td>
     </tr>
     {% empty %}
     <tr>
