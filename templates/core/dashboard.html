@@ -1,8 +1,8 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-<h2>Dashboard</h2>
-<p class="small">Panoramica rapida delle scadenze.</p>
+<h2>Attività in corso e prossime scadenze.</h2>
+<p class="small">Attività in corso e prossime scadenze.</p>
 
 <form method="get" class="filters">
     <select name="soggetto">
@@ -14,65 +14,57 @@
         {% endfor %}
     </select>
 
-    <select name="stato">
-        <option value="">Tutti gli stati</option>
-        <option value="da_fare" {% if stato_selezionato == "da_fare" %}selected{% endif %}>Da fare</option>
-        <option value="in_corso" {% if stato_selezionato == "in_corso" %}selected{% endif %}>In corso</option>
-        <option value="fatto" {% if stato_selezionato == "fatto" %}selected{% endif %}>Fatto</option>
-        <option value="in_attesa" {% if stato_selezionato == "in_attesa" %}selected{% endif %}>In attesa</option>
-        <option value="da_chiarire" {% if stato_selezionato == "da_chiarire" %}selected{% endif %}>Da chiarire</option>
-    </select>
-
     <button type="submit">Filtra</button>
     <a href="/">Azzera filtri</a>
 </form>
 
 <div class="cards">
     <div class="card">
-        <h3>Totale attività</h3>
-        <div class="big-number">{{ totale }}</div>
-    </div>
-
-    <div class="card">
-        <h3>Completate</h3>
-        <div class="big-number">{{ completate }}</div>
-    </div>
-
-    <div class="card">
         <h3>In ritardo</h3>
         <div class="big-number">{{ in_ritardo }}</div>
+    </div>
+
+    <div class="card">
+        <h3>Da chiudere entro 7 giorni</h3>
+        <div class="big-number">{{ da_chiudere_presto }}</div>
     </div>
 
     <div class="card">
         <h3>In corso</h3>
         <div class="big-number">{{ in_corso_count }}</div>
     </div>
+
+    <div class="card">
+        <h3>Aperte nell’ultimo mese</h3>
+        <div class="big-number">{{ ultimo_mese_count }}</div>
+    </div>
 </div>
 
-<h3 class="section-title">Da chiudere presto / urgenti</h3>
-<p class="small">Ordinamento basato sulla data di conclusione interna.</p>
+<h3 class="section-title">Da chiudere</h3>
+<p class="small">Attività aperte con data di scadenza entro i prossimi 7 giorni.</p>
 
 <table>
     <tr>
-        <th>Ente</th>
         <th>Progetto</th>
+        <th>Tipo</th>
+        <th>Ente</th>
+        <th>Responsabili</th>
         <th>Stato</th>
-        <th>Scadenza ufficiale</th>
-        <th>Giorni mancanti</th>
+        <th>Giorni</th>
     </tr>
-    {% for s in urgenti %}
+
+    {% for s in da_chiudere %}
     <tr class="
-        {% if s.stato == 'fatto' %}
-            fatta
-        {% elif s.data_conclusione and s.data_conclusione < oggi %}
+        {% if s.data_scadenza < oggi %}
             ritardo
-        {% elif s.data_conclusione and s.data_conclusione <= prossimi_7 %}
+        {% elif s.data_scadenza <= prossimi_7 %}
             prossima
         {% endif %}
     ">
-    <tr>
-        <td>{{ s.ente|default:"—" }}</td>
         <td>{{ s.edizione }}</td>
+        <td>{{ s.tipo|default:"—" }}</td>
+        <td>{{ s.ente|default:"—" }}</td>
+        <td>{% for r in s.responsabili.all %}<span class="user-chip"><span class="mini-avatar">{% if r.first_name %}{{ r.first_name|first }}{% else %}{{ r.username|first }}{% endif %}</span>{% if r.first_name or r.last_name %}{{ r.first_name }} {{ r.last_name }}{% else %}{{ r.username }}{% endif %}</span>{% empty %}—{% endfor %}</td>
         <td>
             {% if s.stato == "da_fare" %}
                 <span class="status todo"><span class="status-dot"></span>Da fare</span>
@@ -88,60 +80,42 @@
                 <span class="status unclear"><span class="status-dot"></span>{{ s.get_stato_display }}</span>
             {% endif %}
         </td>
-        <td>{{ s.data_scadenza|date:"d/m/Y"|default:"—" }}</td>
         <td>{{ s.giorni_alla_scadenza|default:"—" }}</td>
     </tr>
     {% empty %}
     <tr>
-        <td colspan="7">Nessuna scadenza trovata.</td>
+        <td colspan="6">Nessuna attività da chiudere.</td>
     </tr>
     {% endfor %}
 </table>
 
-<h3 class="section-title">Attività in corso</h3>
+<h3 class="section-title">In corso nell’ultimo mese</h3>
+<p class="small">Attività segnate come “in corso” con scadenza recente o prossima.</p>
 
 <table>
     <tr>
-        <th>Titolo</th>
-        <th>Soggetto</th>
         <th>Progetto</th>
-        <th>Conclusione</th>
-        <th>Scadenza ufficiale</th>
+        <th>Tipo</th>
+        <th>Ente</th>
+        <th>Responsabili</th>
+        <th>Stato</th>
+        <th>Giorni</th>
     </tr>
+
     {% for s in in_corso %}
     <tr>
-        <td>{{ s.titolo }}</td>
-        <td>{{ s.edizione.progetto.soggetto|default:"—" }}</td>
         <td>{{ s.edizione }}</td>
-        <td>{{ s.data_conclusione|date:"d/m/Y"|default:"—" }}</td>
-        <td>{{ s.data_scadenza|date:"d/m/Y"|default:"—" }}</td>
+        <td>{{ s.tipo|default:"—" }}</td>
+        <td>{{ s.ente|default:"—" }}</td>
+        <td>{% for r in s.responsabili.all %}<span class="user-chip"><span class="mini-avatar">{% if r.first_name %}{{ r.first_name|first }}{% else %}{{ r.username|first }}{% endif %}</span>{% if r.first_name or r.last_name %}{{ r.first_name }} {{ r.last_name }}{% else %}{{ r.username }}{% endif %}</span>{% empty %}—{% endfor %}</td>
+        <td>
+            <span class="status progress"><span class="status-dot"></span>In corso</span>
+        </td>
+        <td>{{ s.giorni_alla_scadenza|default:"—" }}</td>
     </tr>
     {% empty %}
     <tr>
-        <td colspan="5">Nessuna attività in corso.</td>
-    </tr>
-    {% endfor %}
-</table>
-
-<h3 class="section-title">Attività completate di recente</h3>
-
-<table>
-    <tr>
-        <th>Titolo</th>
-        <th>Soggetto</th>
-        <th>Progetto</th>
-        <th>Conclusione</th>
-    </tr>
-    {% for s in ultime_completate %}
-    <tr>
-        <td>{{ s.titolo }}</td>
-        <td>{{ s.edizione.progetto.soggetto|default:"—" }}</td>
-        <td>{{ s.edizione }}</td>
-        <td>{{ s.data_conclusione|date:"d/m/Y"|default:"—" }}</td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="4">Nessuna attività completata.</td>
+        <td colspan="6">Nessuna attività in corso nell’ultimo mese.</td>
     </tr>
     {% endfor %}
 </table>

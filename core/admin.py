@@ -23,12 +23,12 @@ class ProgettoAdmin(admin.ModelAdmin):
 class EdizioneProgettoAdmin(admin.ModelAdmin):
     list_display = ["__str__", "progetto", "anno", "una_tantum"]
     list_filter = ["una_tantum", "progetto"]
-    search_fields = ["titolo", "progetto__nome"]
+    search_fields = ["progetto__nome"]
 
 @admin.register(Scadenza)
 class ScadenzaAdmin(admin.ModelAdmin):
     list_display = [
-        "titolo",
+        "__str__",
         "edizione",
         "soggetto_progetto",
         "ente",
@@ -37,7 +37,6 @@ class ScadenzaAdmin(admin.ModelAdmin):
         "priorita",
         "data_avvio",
         "data_scadenza",
-        "data_conclusione",
         "giorni_alla_scadenza_admin",
     ]
     list_filter = [
@@ -50,11 +49,9 @@ class ScadenzaAdmin(admin.ModelAdmin):
     ]
 
     search_fields = [
-        "titolo",
         "descrizione",
         "note",
         "edizione__progetto__nome",
-        "edizione__titolo",
     ]
     filter_horizontal = ["responsabili"]
     autocomplete_fields = ["ente", "tipo", "edizione"]

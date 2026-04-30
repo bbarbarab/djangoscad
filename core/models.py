@@ -27,7 +27,6 @@ class Soggetto(models.Model):
     def __str__(self):
         return self.nome
 
-
 class TipoScadenza(models.Model):
     nome = models.CharField(max_length=100, unique=True)
 
@@ -51,7 +50,7 @@ class Progetto(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="scadenze"
+        related_name="progetti"
     )
 
     ricorrenza = models.CharField(
@@ -77,7 +76,6 @@ class EdizioneProgetto(models.Model):
         related_name="edizioni"
     )
     anno = models.PositiveIntegerField(null=True, blank=True)
-    titolo = models.CharField(max_length=255, blank=True)
     una_tantum = models.BooleanField(default=False)
     note = models.TextField(blank=True)
 
@@ -94,11 +92,10 @@ class EdizioneProgetto(models.Model):
 
     def __str__(self):
         if self.una_tantum:
-            return self.titolo or f"{self.progetto.nome} (una tantum)"
+            return f"{self.progetto.nome} (una tantum)"
         if self.anno:
             return f"{self.progetto.nome} {self.anno}"
-        return self.titolo or self.progetto.nome
-
+        return self.progetto.nome
 class Scadenza(models.Model):
 
     class Stato(models.TextChoices):
@@ -134,7 +131,6 @@ class Scadenza(models.Model):
         related_name="scadenze"
     )
 
-    titolo = models.CharField(max_length=255)
     descrizione = models.TextField(blank=True)
 
     responsabili = models.ManyToManyField(
@@ -156,7 +152,6 @@ class Scadenza(models.Model):
 
     data_avvio = models.DateField(null=True, blank=True)
     data_scadenza = models.DateField(null=True, blank=True)
-    data_conclusione = models.DateField(null=True, blank=True)
 
     importo = models.DecimalField(
         max_digits=12,
@@ -170,32 +165,23 @@ class Scadenza(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["data_scadenza", "titolo"]
+        ordering = ["data_scadenza"]
         verbose_name = "Scadenza"
         verbose_name_plural = "Scadenze"
 
     def __str__(self):
-        if self.titolo:
-            return self.titolo
-
         parti = []
 
         if self.tipo:
             parti.append(str(self.tipo))
 
-        if self.ente:
-            parti.append(str(self.ente))
-
         if self.edizione:
             parti.append(str(self.edizione))
 
-        return " - ".join(parti) if parti else f"Scadenza {self.pk}"
+        if self.ente:
+            parti.append(str(self.ente))
 
-    @property
-    def giorni_alla_conclusione(self):
-        if not self.data_conclusione:
-            return None
-        return (self.data_conclusione - timezone.localdate()).days
+        return " - ".join(parti) if parti else f"Scadenza {self.pk}"
 
     @property
     def giorni_alla_scadenza(self):

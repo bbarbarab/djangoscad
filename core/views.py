@@ -13,10 +13,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         ctx = super().get_context_data(**kwargs)
 
         today = timezone.localdate()
+        last_30_days = today - timedelta(days=30)
         next_7_days = today + timedelta(days=7)
 
         soggetto_id = self.request.GET.get("soggetto", "").strip()
-        stato = self.request.GET.get("stato", "").strip()
 
         qs = Scadenza.objects.select_related(
             "edizione",
@@ -29,48 +29,48 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         if soggetto_id:
             qs = qs.filter(edizione__progetto__soggetto_id=soggetto_id)
 
-        if stato:
-            qs = qs.filter(stato=stato)
-
         aperte = qs.exclude(stato=Scadenza.Stato.FATTO)
-        
-        # Contatori
-        ctx["totale"] = qs.count()
-        ctx["completate"] = qs.filter(stato=Scadenza.Stato.FATTO).count()
-        ctx["in_corso_count"] = qs.filter(stato=Scadenza.Stato.IN_CORSO).count()
 
+        # Contatori sintetici dashboard
         ctx["in_ritardo"] = aperte.filter(
-            data_conclusione__isnull=False,
-            data_conclusione__lt=today
+            data_scadenza__isnull=False,
+            data_scadenza__lt=today,
         ).count()
 
         ctx["da_chiudere_presto"] = aperte.filter(
-            data_conclusione__isnull=False,
-            data_conclusione__gte=today,
-            data_conclusione__lte=next_7_days
+            data_scadenza__isnull=False,
+            data_scadenza__gte=today,
+            data_scadenza__lte=next_7_days,
         ).count()
 
-        # Tabelle
-        ctx["urgenti"] = aperte.filter(
-            data_conclusione__isnull=False
-        ).order_by("data_conclusione", "titolo")[:10]
-
-        ctx["in_corso"] = qs.filter(
+        ctx["in_corso_count"] = qs.filter(
             stato=Scadenza.Stato.IN_CORSO
-        ).order_by("data_conclusione", "data_scadenza", "titolo")[:10]
+        ).count()
 
-        ctx["ultime_completate"] = qs.filter(
-            stato=Scadenza.Stato.FATTO
-        ).order_by("-updated_at")[:10]
+        ctx["ultimo_mese_count"] = aperte.filter(
+            data_scadenza__isnull=False,
+            data_scadenza__gte=last_30_days,
+        ).count()
+
+        # Tabella 1: cose da chiudere ora
+        ctx["da_chiudere"] = aperte.filter(
+            data_scadenza__isnull=False,
+            data_scadenza__lte=next_7_days,
+        ).order_by("data_scadenza", "data_scadenza")[:15]
+
+        # Tabella 2: cose in corso nell'ultimo mese
+        ctx["in_corso"] = qs.filter(
+            stato=Scadenza.Stato.IN_CORSO,
+            data_scadenza__isnull=False,
+            data_scadenza__gte=last_30_days,
+        ).order_by("data_scadenza")[:15]
 
         ctx["soggetti"] = Soggetto.objects.all().order_by("nome")
         ctx["soggetto_selezionato"] = soggetto_id
-        ctx["stato_selezionato"] = stato
         ctx["oggi"] = today
-        ctx["prossimi_7"] = today + timedelta(days=7)
-        
-        return ctx
+        ctx["prossimi_7"] = next_7_days
 
+        return ctx
 
 class ScadenzaListView(LoginRequiredMixin, ListView):
     model = Scadenza
@@ -103,7 +103,7 @@ class ScadenzaListView(LoginRequiredMixin, ListView):
         if responsabile_id:
             qs = qs.filter(responsabili__id=responsabile_id)
 
-        return qs.order_by("data_conclusione", "data_scadenza", "titolo").distinct()
+        return qs.order_by("data_scadenza").distinct()
 
     def get_context_data(self, **kwargs):
         
