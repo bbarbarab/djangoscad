@@ -334,11 +334,11 @@
 {% if request.user.is_authenticated %}
 <div id="toast-msg" class="toast">
     <span class="avatar">
-        {% if request.user.first_name %}
-            {{ request.user.first_name|first }}
-        {% else %}
-            {{ request.user.username|first }}
-        {% endif %}
+    {% if request.user.profilo %}
+        {{ request.user.profilo.emoji }}
+    {% else %}
+        👋
+    {% endif %}
     </span>
     <span>
         Ciao

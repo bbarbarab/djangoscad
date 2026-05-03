@@ -194,3 +194,48 @@ class Scadenza(models.Model):
         if not self.data_scadenza or self.stato == self.Stato.FATTO:
             return False
         return self.data_scadenza < timezone.localdate()
+    
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class ProfiloUtente(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profilo")
+
+    class Avatar(models.TextChoices):
+        ORSETTO = "orso", "🐻 Orsetto"
+        GATTO = "gatto", "🐱 Gatto"
+        VOLPE = "volpe", "🦊 Volpe"
+        UNICORNO = "unicorno", "🦄 Unicorno"
+        PANDA = "panda", "🐼 Panda"
+        CONIGLIO = "coniglio", "🐰 Coniglio"
+        RANA = "rana", "🐸 Rana"
+
+    avatar = models.CharField(
+        max_length=20,
+        choices=Avatar.choices,
+        default=Avatar.GATTO
+    )
+
+    def emoji(self):
+        mapping = {
+            "orso": "🐻",
+            "gatto": "🐱",
+            "volpe": "🦊",
+            "unicorno": "🦄",
+            "panda": "🐼",
+            "coniglio": "🐰",
+            "rana": "🐸",
+        }
+        return mapping.get(self.avatar, "🐱")
+
+    def __str__(self):
+        return f"Profilo {self.user}"
+    
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=User)
+def crea_profilo(sender, instance, created, **kwargs):
+    if created:
+        ProfiloUtente.objects.create(user=instance)

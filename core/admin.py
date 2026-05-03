@@ -1,6 +1,9 @@
 from django.contrib import admin
-from .models import Ente, Soggetto, TipoScadenza, Progetto, EdizioneProgetto, Scadenza
+from .models import Ente, Soggetto, TipoScadenza, Progetto, EdizioneProgetto, Scadenza, ProfiloUtente
 
+@admin.register(ProfiloUtente)
+class ProfiloUtenteAdmin(admin.ModelAdmin):
+    list_display = ["user", "avatar"]
 @admin.register(Ente)
 class EnteAdmin(admin.ModelAdmin):
     search_fields = ["nome"]
