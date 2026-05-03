@@ -103,7 +103,27 @@ class ScadenzaListView(LoginRequiredMixin, ListView):
         if responsabile_id:
             qs = qs.filter(responsabili__id=responsabile_id)
 
-        return qs.order_by("data_scadenza").distinct()
+        from django.db.models import Case, When, Value, IntegerField
+
+        qs = qs.annotate(
+            ordine_stato=Case(
+                When(stato=Scadenza.Stato.FATTO, then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField(),
+            ),
+            ordine_priorita=Case(
+                When(priorita=Scadenza.Priorita.ALTA, then=Value(0)),
+                When(priorita=Scadenza.Priorita.MEDIA, then=Value(1)),
+                When(priorita=Scadenza.Priorita.BASSA, then=Value(2)),
+                output_field=IntegerField(),
+            ),
+        )
+
+        return qs.order_by(
+            "ordine_stato",      # prima non fatti
+            "ordine_priorita",   # alta → media → bassa
+            "data_scadenza"      # più vicine prima
+        ).distinct()
 
     def get_context_data(self, **kwargs):
         
