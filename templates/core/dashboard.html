@@ -109,7 +109,19 @@
         <td>{{ s.ente|default:"—" }}</td>
         <td>{% for r in s.responsabili.all %}<span class="user-chip"><span class="mini-avatar">{% if r.first_name %}{{ r.first_name|first }}{% else %}{{ r.username|first }}{% endif %}</span>{% if r.first_name or r.last_name %}{{ r.first_name }} {{ r.last_name }}{% else %}{{ r.username }}{% endif %}</span>{% empty %}—{% endfor %}</td>
         <td>
-            <span class="status progress"><span class="status-dot"></span>In corso</span>
+            {% if s.stato == "da_fare" %}
+                <span class="status todo"><span class="status-dot"></span>Da fare</span>
+            {% elif s.stato == "in_corso" %}
+                <span class="status progress"><span class="status-dot"></span>In corso</span>
+            {% elif s.stato == "fatto" %}
+                <span class="status done"><span class="status-dot"></span>Fatto</span>
+            {% elif s.stato == "in_attesa" %}
+                <span class="status waiting"><span class="status-dot"></span>In attesa</span>
+            {% elif s.stato == "da_chiarire" %}
+                <span class="status unclear"><span class="status-dot"></span>Da chiarire</span>
+            {% else %}
+                <span class="status unclear"><span class="status-dot"></span>{{ s.get_stato_display }}</span>
+            {% endif %}
         </td>
         <td>{{ s.giorni_alla_scadenza|default:"—" }}</td>
     </tr>

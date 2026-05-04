@@ -58,19 +58,18 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             data_scadenza__lte=next_7_days,
         ).order_by("data_scadenza", "data_scadenza")[:15]
 
-        # Tabella 2: cose da fare e in corso da fare in 60 giorni
+        # Tabella 2: cose da fare e in corso da concludere in 60 giorni
         next_60_days = today + timedelta(days=60)
 
         ctx["in_corso"] = qs.filter(
-            stato__in=[
-                Scadenza.Stato.IN_CORSO,
-                Scadenza.Stato.DA_FARE,
-            ],
+            stato=Scadenza.Stato.IN_CORSO,
+        ).order_by("data_scadenza")[:10]
+
+        ctx["da_fare"] = qs.filter(
+            stato=Scadenza.Stato.DA_FARE,
             data_scadenza__isnull=False,
             data_scadenza__lte=next_60_days,
-        ).exclude(
-            stato=Scadenza.Stato.FATTO
-        ).order_by("data_scadenza")[:20]
+        ).order_by("data_scadenza")[:10]
 
         ctx["soggetti"] = Soggetto.objects.all().order_by("nome")
         ctx["soggetto_selezionato"] = soggetto_id
