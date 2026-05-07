@@ -116,6 +116,10 @@
             margin: 28px 0 12px 0;
         }
 
+        .urgent-title {
+            color: #1f4e78;
+        }
+
         .small {
             color: #666;
             font-size: 13px;
@@ -287,6 +291,63 @@
         .priority.bassa {
             background: #eef2ff;
             color: #3730a3;
+        }
+        
+        .personal-panel {
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0 24px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,.08);
+        }
+
+        .personal-avatar {
+            width: 78px;
+            height: 78px;
+            border-radius: 50%;
+            background: #eef3f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            flex-shrink: 0;
+        }
+
+        .personal-content h3 {
+            margin: 0 0 4px 0;
+            font-size: 22px;
+        }
+
+        .personal-content p {
+            margin-top: 0;
+        }
+
+        .personal-list {
+            list-style: none;
+            padding: 0;
+            margin: 12px 0 0 0;
+        }
+
+        .personal-list li {
+            display: grid;
+            grid-template-columns: 1.4fr 1.4fr auto;
+            gap: 12px;
+            padding: 8px 0;
+            border-top: 1px solid #eef0f3;
+            align-items: center;
+        }
+
+        .personal-list span {
+            color: #555;
+        }
+
+        .personal-list em {
+            font-style: normal;
+            font-weight: 700;
+            color: #1f4e78;
         }
 
     </style>

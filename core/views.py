@@ -75,6 +75,12 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         ctx["oggi"] = today
         ctx["prossimi_7"] = next_7_days
 
+        ctx["mie_scadenze"] = qs.filter(
+            responsabili=self.request.user
+        ).exclude(
+            stato=Scadenza.Stato.FATTO
+        ).order_by("data_scadenza")[:5]
+
         return ctx
 
 class ScadenzaListView(LoginRequiredMixin, ListView):

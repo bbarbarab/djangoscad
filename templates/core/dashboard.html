@@ -4,6 +4,55 @@
 <h2>Attività in corso e prossime scadenze.</h2>
 <p class="small">Attività in corso e prossime scadenze.</p>
 
+<div class="personal-panel">
+    <div class="personal-avatar">
+        {% if request.user.profilo %}
+            {{ request.user.profilo.emoji }}
+        {% else %}
+            👋
+        {% endif %}
+    </div>
+
+    <div class="personal-content">
+        <h3>
+            ciao,
+            {% if request.user.first_name %}
+                {{ request.user.first_name }}
+            {% else %}
+                {{ request.user.username }}
+            {% endif %}
+        </h3>
+
+        <p>Queste sono le tue scadenze aperte più vicine.</p>
+
+        {% if mie_scadenze %}
+            <ul class="personal-list">
+                {% for s in mie_scadenze %}
+                    <li>
+                        <strong>{{ s.edizione }}</strong>
+                        <span>{{ s.tipo|default:"—" }} · {{ s.ente|default:"—" }}</span>
+                        <em>
+                            {% if s.giorni_alla_scadenza is not None %}
+                                {% if s.giorni_alla_scadenza < 0 %}
+                                    Scaduto
+                                {% elif s.giorni_alla_scadenza == 0 %}
+                                    Oggi
+                                {% else %}
+                                    {{ s.giorni_alla_scadenza }} gg
+                                {% endif %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </em>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="small">Non hai scadenze aperte assegnate.</p>
+        {% endif %}
+    </div>
+</div>
+
 <form method="get" class="filters">
     <select name="soggetto">
         <option value="">Tutti i soggetti</option>
@@ -40,7 +89,7 @@
     </div>
 </div>
 
-<h3 class="section-title">Attività da chiudere entro i prossimi 7 giorni</h3>
+<h3 class="urgent-title">Attività da chiudere entro i prossimi 7 giorni</h3>
 <p class="small"> </p>
 
 <table>
@@ -89,7 +138,7 @@
     {% endfor %}
 </table>
 
-<h3 class="section-title">Attività da chiudere entro 60 giorni.</h3>
+<h3 class="urgent-title">Attività da chiudere entro 60 giorni.</h3>
 <p class="small"></p>
 
 <table>
