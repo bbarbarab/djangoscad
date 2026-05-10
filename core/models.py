@@ -200,6 +200,11 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class ProfiloUtente(models.Model):
+
+    class Meta:
+        verbose_name = "Profilo utente"
+        verbose_name_plural = "Profili utente"
+        
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profilo")
 
     class Avatar(models.TextChoices):
