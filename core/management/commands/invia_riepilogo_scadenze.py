@@ -108,6 +108,7 @@ class Command(BaseCommand):
 
             if tutte_aperte.exists():
                 righe.append("RIEPILOGO GENERALE")
+                righe.append("DEBUG: questa è la versione nuova del comando")
                 for s in tutte_aperte:
                     responsabili = ", ".join(
                         [
