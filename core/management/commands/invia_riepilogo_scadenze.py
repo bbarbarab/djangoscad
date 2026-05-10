@@ -48,7 +48,19 @@ class Command(BaseCommand):
             )
             altre = scadenze.filter(data_scadenza__gt=next_7_days)[:10]
 
-            if not scadute.exists() and not prossime.exists() and not altre.exists():
+            tutte_aperte = (
+                Scadenza.objects
+                .exclude(stato=Scadenza.Stato.FATTO)
+                .filter(data_scadenza__isnull=False)
+                .order_by("data_scadenza")[:15]
+            )
+
+            if (
+                not scadute.exists()
+                and not prossime.exists()
+                and not altre.exists()
+                and not tutte_aperte.exists()
+            ):
                 continue
 
             nome = user.first_name or user.username
@@ -93,13 +105,6 @@ class Command(BaseCommand):
                         f"(scadenza: {s.data_scadenza.strftime('%d/%m/%Y')})"
                     )
                 righe.append("")
-
-            tutte_aperte = (
-                Scadenza.objects
-                .exclude(stato=Scadenza.Stato.FATTO)
-                .filter(data_scadenza__isnull=False)
-                .order_by("data_scadenza")[:15]
-            )
 
             if tutte_aperte.exists():
                 righe.append("RIEPILOGO GENERALE")
