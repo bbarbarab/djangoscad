@@ -16,7 +16,7 @@ class Command(BaseCommand):
         today = timezone.localdate()
 
         
-        if today.weekday() != 0:  # 0 = lunedì
+        if today.weekday() != 6:  # 0 = lunedì
             self.stdout.write("Oggi non è lunedì: nessuna mail inviata.")
             return
             
@@ -91,6 +91,30 @@ class Command(BaseCommand):
                     righe.append(
                         f"- {s.edizione} — {s.tipo or '—'} — {s.ente or '—'} "
                         f"(scadenza: {s.data_scadenza.strftime('%d/%m/%Y')})"
+                    )
+                righe.append("")
+
+            tutte_aperte = (
+                Scadenza.objects
+                .exclude(stato=Scadenza.Stato.FATTO)
+                .filter(data_scadenza__isnull=False)
+                .order_by("data_scadenza")[:15]
+            )
+
+            if tutte_aperte.exists():
+                righe.append("RIEPILOGO GENERALE")
+                for s in tutte_aperte:
+                    responsabili = ", ".join(
+                        [
+                            (r.get_full_name() or r.username)
+                            for r in s.responsabili.all()
+                        ]
+                    ) or "nessun responsabile"
+
+                    righe.append(
+                        f"- {s.edizione} — {s.tipo or '—'} — {s.ente or '—'} "
+                        f"({s.get_stato_display()}, scadenza: {s.data_scadenza.strftime('%d/%m/%Y')}, "
+                        f"resp.: {responsabili})"
                     )
                 righe.append("")
 
