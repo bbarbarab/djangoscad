@@ -87,7 +87,7 @@ class Command(BaseCommand):
                 righe.append("")
 
             if prossime.exists():
-                righe.append("ENTRO 7 GIORNI")
+                righe.append("*ENTRO 7 GIORNI*")
                 for s in prossime:
                     giorni = s.giorni_alla_scadenza
                     quando = "oggi" if giorni == 0 else f"tra {giorni} gg"
@@ -98,7 +98,7 @@ class Command(BaseCommand):
                 righe.append("")
 
             if altre.exists():
-                righe.append("ALTRE APERTE")
+                righe.append("*ALTRE APERTE*")
                 for s in altre:
                     righe.append(
                         f"- {s.edizione} — {s.tipo or '—'} — {s.ente or '—'} "
@@ -107,7 +107,7 @@ class Command(BaseCommand):
                 righe.append("")
 
             if tutte_aperte.exists():
-                righe.append("RIEPILOGO GENERALE")
+                righe.append("*RIEPILOGO GENERALE*")
                 for s in tutte_aperte:
                     responsabili = ", ".join(
                         [
