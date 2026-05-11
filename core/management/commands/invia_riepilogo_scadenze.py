@@ -16,7 +16,7 @@ class Command(BaseCommand):
         today = timezone.localdate()
 
         
-        if today.weekday() != 6:  # 0 = lunedì
+        if today.weekday() != 0:  # 0 = lunedì
             self.stdout.write("Oggi non è lunedì: nessuna mail inviata.")
             return
             
