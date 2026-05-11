@@ -73,7 +73,7 @@ class Command(BaseCommand):
             righe = [
                 f"{avatar} Ciao {nome},",
                 "",
-                "ecco il riepilogo settimanale delle tue scadenze.",
+                "ecco il riepilogo settimanale delle *tue* scadenze.",
                 "",
             ]
 
@@ -98,7 +98,7 @@ class Command(BaseCommand):
                 righe.append("")
 
             if altre.exists():
-                righe.append("*ALTRE APERTE*")
+                righe.append("*SCADENZE APERTE*")
                 for s in altre:
                     righe.append(
                         f"- {s.edizione} — {s.tipo or '—'} — {s.ente or '—'} "
@@ -107,7 +107,9 @@ class Command(BaseCommand):
                 righe.append("")
 
             if tutte_aperte.exists():
-                righe.append("*RIEPILOGO GENERALE*")
+                righe.append("")
+                righe.append("=== RIEPILOGO GENERALE ===")
+                righe.append("")
                 for s in tutte_aperte:
                     responsabili = ", ".join(
                         [
